@@ -28,8 +28,7 @@ You are provided with daily historical sales data. The task is to forecast the t
 - item_category_name - name of item category
 ```
 ## I. Summary
-- Main methods I used for this competition that provides the desired Leaderboard score: LightGBM
-- Methods I tried to implement but resulted in worse RMSE: XGBoos, Stacking (both simple averaging and metal models such as Linear Regression and shallow random forest)
+- Main methods I used for this: LightGBM
 - The most important features are lag features of previous months, especially the ‘item_cnt_day’ lag features. Some of them, which can be found in my lag dataset, are 
   - **target_lag_1,target_lag_2**: item_cnt_day of each shop – item pair of previous month and previous two months
   - **item_block_target_mean_lag_1, item_block_target_sum_lag_1**: sum and mean of item_cnt_day per item of previous month
@@ -91,14 +90,7 @@ Results from this function can be passed to sklearn GridSearchCV.
 ### 1. LightGBM
 LightGBM is tuned using hyperopt, then manually tune with GridSearchCV to get the optimal result. One interesting thing I found: when tuning the size of the tree, it’s better to tune min_data_in_leaf instead of max_depth. This means to let the tree grows freely until the condition for min_data_in_leaf is met. I believe this will allow deeper logic to develop without overfitting too much. Colsample_bytree and subsample are also used to control overfitting. And I keep the learning rate small (0.03) throughout tuning.
 
-Mean RMSE of 6 folds CV is 0.8088, which is better than any other models I used.
-
 You can find more information in [LGB notebook](lightgbm_tuning.ipynb). From this file I also created out-of-fold features for block 29 to 33, which is used for ensembling later.
-
-Also from this notebook, you can get the leaderboard submission under the file name: ‘coursera_tuned_lightgbm_basic_6folds.csv'
-
-(Note: I do not include some of hyper parameter tuning results from hyperopt since I tuned it at work and I do not have access to that machine now)
-
 
 ### 2. XGBoost
 I pick 2 models: one with max_depth tuned, and one without max_depth tuned, to get out-of-fold features and hoping they are different enough for ensembling. 
